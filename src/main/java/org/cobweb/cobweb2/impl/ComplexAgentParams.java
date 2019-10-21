@@ -233,13 +233,41 @@ public class ComplexAgentParams implements ResizableParam {
 
 	/**
 	 * The probability of giving birth to an agent of "possible child type"
-     * e.g. if probGiveBirthToOtherType = 0.8, then prob. of giving birth to
-     * "possible child type" is 0.8, the prob. of giving birth to this agent type
-     * is 0.1, the prob. of giving birth to its partner type is 0.1.
+	 * e.g. if probGiveBirthToOtherType = 0.8, then prob. of giving birth to
+	 * "possible child type" is 0.8, the prob. of giving birth to this agent type
+     	 * is 0.1, the prob. of giving birth to its partner type is 0.1.
 	 */
 	@ConfDisplayName("Probability of giving birth to child")
 	@ConfXMLTag("ProbGiveBirthToOtherType")
 	public MutatableFloat probGiveBirthToOtherType = new MutatableFloat(0);
+	 
+	/**
+	 * Agent speed.
+	 */
+	@ConfDisplayName("Agent Movement Speed")
+	@ConfXMLTag("agentMovementSpeed")
+	public MutatableFloat agentMovementSpeed = new MutatableFloat(1f);
+
+	/**
+	 * Chance an agent breeds asexually at a time step.
+	 */
+	@ConfDisplayName("Split chance")
+	@ConfXMLTag("splitChance")
+	public MutatableFloat splitChance = new MutatableFloat(0);
+
+	/**
+	 * Energy threshold at which splitting occurs.
+	 */
+	@ConfDisplayName("Split energy threshold")
+	@ConfXMLTag("SplitEnergyThreshold")
+	public MutatableInt splitEnergyThreshold = new MutatableInt(60);
+
+	/**
+	 * Energy split ratio.
+	 */
+	@ConfDisplayName("Split energy ratio")
+	@ConfXMLTag("SplitEnergyRatio")
+	public String splitEnergyRatio = "[0.5, 0.5]";
 
 	/**
 	 * Agent's food web parameters.
