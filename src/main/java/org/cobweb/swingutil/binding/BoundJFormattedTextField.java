@@ -1,10 +1,13 @@
 package org.cobweb.swingutil.binding;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.Format;
 
 import javax.swing.JFormattedTextField;
+import javax.swing.SwingUtilities;
 
 import org.cobweb.cobweb2.ui.config.PropertyAccessor;
 
@@ -26,6 +29,29 @@ public class BoundJFormattedTextField extends JFormattedTextField implements Fie
 		// Set current value
 		this.setValue(field.get(this.obj));
 		this.addPropertyChangeListener("value", this);
+
+		// Select all text when the focus is on the field
+		this.addFocusListener(
+				new FocusListener() {
+
+					@Override
+					public void focusGained(FocusEvent fe) {
+						SwingUtilities.invokeLater(new Runnable() {
+
+							@Override
+							public void run() {
+								BoundJFormattedTextField.this.selectAll();
+							}});
+
+
+					}
+
+					@Override
+					public void focusLost(FocusEvent fe) {
+						BoundJFormattedTextField.this.select(0, 0);
+						BoundJFormattedTextField.this.fireActionPerformed();
+					}}
+				);
 	}
 
 	@Override

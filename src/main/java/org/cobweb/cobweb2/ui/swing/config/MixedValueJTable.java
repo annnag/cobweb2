@@ -4,12 +4,15 @@
 package org.cobweb.cobweb2.ui.swing.config;
 
 import java.awt.Component;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.text.DecimalFormat;
 import java.util.Set;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -77,6 +80,15 @@ public class MixedValueJTable extends JTable {
 
 	}
 
+	private static class SelectAllCellEditor extends DefaultCellEditor {
+
+		public SelectAllCellEditor(JTextField textField) {
+			super(textField);
+			// TODO Auto-generated constructor stub
+		}
+
+	}
+
 	private final class PerciseDecimalTableCellRenderer extends DefaultTableCellRenderer {
 
 		private static final long serialVersionUID = -1919381757017436295L;
@@ -93,6 +105,29 @@ public class MixedValueJTable extends JTable {
 		(JTable tbl, Object value, boolean selected, boolean focused, int row, int col){
 			value = formater.format(value);
 			return super.getTableCellRendererComponent(tbl, value, selected, focused, row, col);
+		}
+	}
+
+	private static class FocusTextField extends JTextField
+	{
+		public FocusTextField(String text)
+		{
+			super(text);
+			addFocusListener(
+					new FocusListener() {
+
+						@Override
+						public void focusGained(FocusEvent fe) {
+							FocusTextField.this.selectAll();
+
+						}
+
+						@Override
+						public void focusLost(FocusEvent fe) {
+							FocusTextField.this.select(0, 0);
+							FocusTextField.this.fireActionPerformed();
+						}}
+					);
 		}
 	}
 
@@ -118,7 +153,10 @@ public class MixedValueJTable extends JTable {
 			editor = new EnumSelectionEditor(getValueAt(row, column).getClass());
 		}
 		if (editor == null && getValueAt(row, column) != null) {
-			editor = getDefaultEditor(getValueAt(row, column).getClass());
+			//editor = getDefaultEditor(getValueAt(row, column).getClass());
+
+			// Select all text when the focus is on the field
+			editor = new SelectAllCellEditor(new FocusTextField(getValueAt(row, column).toString()));
 		}
 		if (editor == null) {
 			editor = getDefaultEditor(getColumnClass(column));
