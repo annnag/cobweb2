@@ -10,12 +10,13 @@ import org.cobweb.cobweb2.core.Location;
 import org.cobweb.cobweb2.core.SimulationTimeSpace;
 import org.cobweb.cobweb2.core.StateParameter;
 import org.cobweb.cobweb2.core.StatePlugin;
+import org.cobweb.cobweb2.plugins.MoveMutator;
 import org.cobweb.cobweb2.plugins.SpawnMutator;
 import org.cobweb.cobweb2.plugins.StatefulMutatorBase;
 import org.cobweb.cobweb2.plugins.UpdateMutator;
 
 
-public class SwarmMutator extends StatefulMutatorBase<SwarmState> implements UpdateMutator, StatePlugin, SpawnMutator {
+public class SwarmMutator extends StatefulMutatorBase<SwarmState> implements UpdateMutator, StatePlugin, SpawnMutator, MoveMutator {
 
 	public SwarmMutator() {
 		super(SwarmState.class);
@@ -110,6 +111,9 @@ public class SwarmMutator extends StatefulMutatorBase<SwarmState> implements Upd
 
 	@Override
 	public void onUpdate(Agent agent) {
+
+		//System.out.println("SwarmMutator onUpdate(Agent agent)");
+
 		SwarmState state = getAgentState(agent);
 		if (!agent.isAlive())
 			return;
@@ -122,6 +126,9 @@ public class SwarmMutator extends StatefulMutatorBase<SwarmState> implements Upd
 	}
 
 	private float calculateScore(PairwiseEffect effect, int type, Agent agent) {
+
+		//System.out.println("Swarm calculateScore");
+
 		if (effect.radius <= 0)
 			return 1;
 
@@ -136,12 +143,21 @@ public class SwarmMutator extends StatefulMutatorBase<SwarmState> implements Upd
 				count++;
 		}
 
+		//System.out.println("Swarm radius in effect. Score: " + effect.score(count));
+
 		return effect.score(count);
 	}
 
 	@Override
 	protected boolean validState(SwarmState value) {
 		return value.agentParams.effects.length == this.params.agentParams.length;
+	}
+
+	@Override
+	public boolean overrideMove(Agent agent) {
+		// TODO Auto-generated method stub
+
+		return false;
 	}
 
 }

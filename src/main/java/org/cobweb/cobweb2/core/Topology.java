@@ -11,13 +11,17 @@ public class Topology {
 	private RandomSource randomSource;
 	public final int width;
 	public final int height;
-	private final boolean wrap;
+	private final boolean wrap;	// Wrap Globe-style
+	private final boolean wrapX;
+	private final boolean wrapY;
 
-	public Topology(RandomSource randomSource, int width, int height, boolean wrap) {
+	public Topology(RandomSource randomSource, int width, int height, boolean wrap, boolean wrapX, boolean wrapY) {
 		this.randomSource = randomSource;
 		this.width = width;
 		this.height = height;
 		this.wrap = wrap;
+		this.wrapX = wrapX;
+		this.wrapY = wrapY;
 	}
 
 	public Location getAdjacent(Location location, Direction direction) {
@@ -63,10 +67,54 @@ public class Topology {
 				x = (x + width / 2) % width;
 				direction = new Direction(-direction.x, -direction.y);
 			}
-		} else {
+
+		}
+		else if(wrapX && wrapY)
+		{
+			x = (x + width) % width;
+			y = (y + height) % height;
+
+		} // if(!wrap && !wrapY)
+		else if(wrapX)
+		{
+			x = (x + width) % width;
+
+			boolean flip = false;
+			if (y < 0) {
+				y = -y - 1;
+				flip = true;
+			} else if (y >= height) {
+				y = height * 2 - y - 1;
+				flip = true;
+			}
+			if (flip) {
+				//y = (y + height / 2) % height;
+				direction = new Direction(direction.x, -direction.y);
+			}
+		} // else if(wrapX)
+		else if(wrapY)
+		{
+			y = (y + height) % height;
+
+			boolean flip = false;
+			if (x < 0) {
+				x = -x - 1;
+				flip = true;
+			} else if (x >= width) {
+				x = width * 2 - x - 1;
+				flip = true;
+			}
+			if (flip) {
+				//x = (x + width / 2) % width;
+				direction = new Direction(-direction.x, direction.y);
+			}
+		} // else if(wrapY)
+		else
+		{
 			if ( x < 0 || x >= width || y < 0 || y >= height)
 				return null;
-		}
+		} // else
+
 		return new LocationDirection(new Location(x, y), direction);
 	}
 
@@ -100,12 +148,51 @@ public class Topology {
 			// wrap up right
 			result.add(new Location(l.x + width / 2,         - l.y - 1));
 		}
+		else if(wrapX && wrapY)
+		{
+			// wrap NORTH
+			result.add(new Location(l.x, l.y - height));
+			// wrap SOUTH
+			result.add(new Location(l.x, l.y + height));
+
+			// wrap EAST
+			result.add(new Location(l.x + width, l.y));
+			// wrap WEST
+			result.add(new Location(l.x - width, l.y));
+
+			// wrap NORTHEAST
+			result.add(new Location(l.x + width, l.y - height));
+			// wrap SOUTHEAST
+			result.add(new Location(l.x + width, l.y + height));
+
+			// wrap NORTHWEST
+			result.add(new Location(l.x - width, l.y - height));
+			// wrap SOUTHWEST
+			result.add(new Location(l.x - width, l.y + height));
+
+		} // if(wrapX && wrapY)
+		else if(wrapX)
+		{
+			// wrap EAST
+			result.add(new Location(l.x + width, l.y));
+			// wrap WEST
+			result.add(new Location(l.x - width, l.y));
+
+		} // else if(wrapX)
+		else if(wrapY)
+		{
+			// wrap NORTH
+			result.add(new Location(l.x, l.y - height));
+			// wrap SOUTH
+			result.add(new Location(l.x, l.y + height));
+
+		} // else if(wrapY)
 
 		return result;
 	}
 
 	private Location getClosestWrapLocation(Location zero, Location target) {
-		if (!wrap)
+		if (!(wrap || wrapX || wrapY))
 			return target;
 
 		double distance = Double.MAX_VALUE;
@@ -121,11 +208,30 @@ public class Topology {
 		return best;
 	}
 
+	public LocationDirection getUnwrappedAdjacent(LocationDirection location) {
+		Direction direction = location.direction;
+		int x = location.x + direction.x;
+		int y = location.y + direction.y;
+
+		return new LocationDirection(new Location(x, y), direction);
+	}
+
+	public LocationDirection getWrappedLocation(LocationDirection location) {
+		Direction direction = location.direction;
+		int x = location.x;
+		int y = location.y;
+
+		x = (x + width) % width;
+		y = (y + height) % height;
+
+		return new LocationDirection(new Location(x, y), direction);
+	}
+
 	public Set<Location> getArea(Location zero, float radius) {
 		Set<Location> result = new HashSet<Location>();
 		float rSquared = radius * radius;
 
-		if (!wrap) {
+		if (!(wrap || wrapX || wrapY)) {
 			int x0 = Math.min(zero.x - (int)Math.ceil(radius), 0);
 			int x1 = Math.max(zero.x + (int)Math.ceil(radius), width - 1);
 			int y0 = Math.min(zero.y - (int)Math.ceil(radius), 0);
@@ -139,8 +245,82 @@ public class Topology {
 					}
 				}
 			}
+		} // if (!wrap)
 
-		} else {
+		else if(!wrap && !wrapX)
+		{
+			if (radius > Math.max(width, height))
+				radius = Math.max(width, height);
+
+			result.add(zero);
+			LocationDirection l = new LocationDirection(zero, NORTH);
+
+			// walk around the zero point in increasingly larger rectangles
+			for (int r = 1; r <= radius; r++) {
+				// North-center point
+				l = getUnwrappedAdjacent(l);
+
+				if(!wrapX &&  !(l.x < 0 || l.x >= width))
+					result.add(getWrappedLocation(l));
+
+				// length of walks along each side of the rectangle
+				// North-center to NE to SE to SW to NW, back to North-center
+				int[] sides = {r, r*2, r*2, r*2, r-1};
+
+				for (int side : sides) {
+					l = getTurnRightPosition(l);
+					for (int i = 0; i < side; i++) {
+						l = getUnwrappedAdjacent(l);
+
+						if(!wrapX &&  !(l.x < 0 || l.x >= width))
+							if (simpleDistanceSquared(zero, l) <= rSquared) // unwrapped so we want simpleDistanceSquared
+								result.add(getWrappedLocation(l));
+					}
+				}
+
+				// finish back at top-center, facing up
+				l = getUnwrappedAdjacent(l);
+				l = getTurnLeftPosition(l);
+			}
+		} // else if(!wrapX)
+		else if(!wrap && !wrapY)
+		{
+			if (radius > Math.max(width, height))
+				radius = Math.max(width, height);
+
+			result.add(zero);
+			LocationDirection l = new LocationDirection(zero, NORTH);
+
+			// walk around the zero point in increasingly larger rectangles
+			for (int r = 1; r <= radius; r++) {
+				// North-center point
+				l = getUnwrappedAdjacent(l);
+
+				if(!wrapY &&  !(l.y < 0 || l.y >= height))
+					result.add(getWrappedLocation(l));
+
+				// length of walks along each side of the rectangle
+				// North-center to NE to SE to SW to NW, back to North-center
+				int[] sides = {r, r*2, r*2, r*2, r-1};
+
+				for (int side : sides) {
+					l = getTurnRightPosition(l);
+					for (int i = 0; i < side; i++) {
+						l = getUnwrappedAdjacent(l);
+
+						if(!wrapY &&  !(l.y < 0 || l.y >= height))
+							if (simpleDistanceSquared(zero, l) <= rSquared) // unwrapped so we want simpleDistanceSquared
+								result.add(getWrappedLocation(l));
+					}
+				}
+
+				// finish back at top-center, facing up
+				l = getUnwrappedAdjacent(l);
+				l = getTurnLeftPosition(l);
+			}
+		} // else if(!wrapY)
+
+		else {
 			if (radius > Math.max(width, height))
 				radius = Math.max(width, height);
 

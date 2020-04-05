@@ -89,7 +89,7 @@ public class BehaviorArray {
 		}
 
 		if (inputSize > 32) {
-			throw new java.lang.IllegalArgumentException("inputSize exceded 32");
+			throw new java.lang.IllegalArgumentException("inputSize exceded 32: " + inputSize);
 		}
 
 		if (outputBits > 32) {
@@ -190,7 +190,10 @@ public class BehaviorArray {
 
 		for (int i = 0; i < outputSize.length; ++i) {
 			out[i] = outputCode.remove(outputSize[i]);
+			//System.out.print(i + "(" + out[i] + ") ");
 		}
+
+		//System.out.println();
 
 		return out;
 	}

@@ -58,7 +58,7 @@ public class ComplexEnvironment extends Environment {
 		data = envParams;
 		agentData = agentParams.agentParams;
 
-		super.load(data.width, data.height, data.wrapMap, keepOldArray);
+		super.load(data.width, data.height, data.wrapMap, data.wrapMapX, data.wrapMapY, keepOldArray);
 
 		// Remove old components
 		if (keepOldAgents) {

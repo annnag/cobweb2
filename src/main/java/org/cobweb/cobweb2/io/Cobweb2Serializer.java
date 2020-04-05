@@ -26,7 +26,10 @@ import org.cobweb.cobweb2.plugins.genetics.PhenotypeIndex;
 import org.cobweb.cobweb2.ui.UserInputException;
 import org.cobweb.io.ChoiceCatalog;
 import org.cobweb.io.ParameterSerializer;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 public class Cobweb2Serializer {
@@ -123,7 +126,8 @@ public class Cobweb2Serializer {
 	private Node saveAgent(Agent simpleAgent, Document d) {
 		ComplexAgent a = (ComplexAgent) simpleAgent;
 
-		Element agent = d.createElement("Agent");
+		//Element agent = d.createElement("Agentor");
+		Element agent = d.createElement(SimulationConfig.agentLabel);
 		agent.setAttribute("type", Integer.toString(a.getType() + 1));
 
 		Element paramsElement = d.createElement("params");
@@ -132,11 +136,11 @@ public class Cobweb2Serializer {
 
 		agent.appendChild(paramsElement);
 
-        {
-            Element energyElement = d.createElement("Energy");
-            energyElement.setTextContent(a.getEnergy() + "");
-            agent.appendChild(energyElement);
-        }
+		{
+			Element energyElement = d.createElement("Energy");
+			energyElement.setTextContent(a.getEnergy() + "");
+			agent.appendChild(energyElement);
+		}
 
 		{
 			Element locationElement = d.createElement("location");
@@ -189,7 +193,7 @@ public class Cobweb2Serializer {
 		params.resize(size); // Fix up for simulation being different than population
 		as.params = params;
 
-//		as.energy = Integer.parseInt(element.getElementsByTagName("Energy").item(0).getNodeValue());
+		//		as.energy = Integer.parseInt(element.getElementsByTagName("Energy").item(0).getNodeValue());
 		as.energy = Integer.parseInt(element.getFirstChild().getNextSibling().getFirstChild().getNodeValue());
 
 		Element location = (Element)element.getElementsByTagName("location").item(0);

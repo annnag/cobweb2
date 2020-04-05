@@ -2,6 +2,7 @@ package org.cobweb.cobweb2.ui.config;
 
 import java.lang.reflect.AnnotatedElement;
 
+import org.cobweb.cobweb2.SimulationConfig;
 import org.cobweb.io.ConfXMLTag;
 
 
@@ -48,7 +49,10 @@ public abstract class PropertyAccessorBase implements PropertyAccessor {
 		if (parent != null)
 			res = parent.getName() + " " + res;
 
-		return res;
+		if(res.equals("Agent Label")) // We make exceptions here.
+			return res;
+		else
+			return res.replace("Agent", SimulationConfig.agentLabel).replace("agent", SimulationConfig.agentLabel.toLowerCase());
 	}
 
 	protected abstract String thisGetName();

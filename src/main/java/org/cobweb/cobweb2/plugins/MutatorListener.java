@@ -1,8 +1,17 @@
 package org.cobweb.cobweb2.plugins;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
-import org.cobweb.cobweb2.core.*;
+import org.cobweb.cobweb2.core.Agent;
+import org.cobweb.cobweb2.core.AgentListener;
+import org.cobweb.cobweb2.core.Cause;
+import org.cobweb.cobweb2.core.ControllerInput;
+import org.cobweb.cobweb2.core.LocationDirection;
 
 
 public class MutatorListener implements AgentListener {
@@ -97,6 +106,9 @@ public class MutatorListener implements AgentListener {
 	@Override
 	public boolean onNextMove(Agent agent) {
 		for (MoveMutator mut : moveMutators) {
+
+			//System.out.println("MoveMutator: " + mut.getClass());
+
 			if (mut.overrideMove(agent)) {
 				return true;
 			}
@@ -114,6 +126,7 @@ public class MutatorListener implements AgentListener {
 	@Override
 	public void onStep(Agent agent, LocationDirection from, LocationDirection to) {
 		for (StepMutator m : stepMutators) {
+			//System.out.println("StepMutator: " + m.getClass());
 			m.onStep(agent, from, to);
 		}
 	}
@@ -183,18 +196,18 @@ public class MutatorListener implements AgentListener {
 
 	@Override
 	public LocationDirection onTryStep(Agent agent, LocationDirection from, LocationDirection originalTo) {
-	    List<LocationDirection> possibles = new LinkedList<>();
+		List<LocationDirection> possibles = new LinkedList<>();
 		for(LocationMutator mutator : locationMutators) {
-            LocationDirection newLoc = mutator.getNewLocation(agent, from, originalTo);
-            if (!newLoc.equals(originalTo)) {
-                possibles.add(newLoc);
-            }
+			LocationDirection newLoc = mutator.getNewLocation(agent, from, originalTo);
+			if (!newLoc.equals(originalTo)) {
+				possibles.add(newLoc);
+			}
 		}
 		if (possibles.isEmpty()) {
-		    return originalTo;
-        } else {
-		    return possibles.get(new Random().nextInt(possibles.size()));
-        }
+			return originalTo;
+		} else {
+			return possibles.get(new Random().nextInt(possibles.size()));
+		}
 	}
 
 	public List<String> logDataAgent(int type) {

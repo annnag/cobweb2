@@ -110,6 +110,10 @@ public class GeneticController implements Controller {
 
 		BitField inputCode = getInputArray(theAgent);
 
+		// if(true) throw new RuntimeException("mutated Output!!");
+		//System.out.println("before actionCode: " + ga.getOutput(inputCode.intValue())[0]);
+		//int before_control = ga.getOutput(inputCode.intValue())[0];
+
 		inputCallback.beforeControl(theAgent, new GCInput(inputCode));
 
 		int[] outputArray = ga.getOutput(inputCode.intValue());
@@ -119,6 +123,10 @@ public class GeneticController implements Controller {
 		theAgent.setCommOutbox(dequantize(outputArray[2], params.communicationBits));
 		//whether to breed
 		theAgent.setShouldReproduceAsex(outputArray[3] != 0);
+
+		//if(before_control != actionCode)
+		//System.out.println("before_control: " + before_control + " actionCode: " + actionCode);
+		//System.out.println("inputCode: " + inputCode.intValue() + " actionCode: " + actionCode + " loc: " + theAgent.getPosition().toString());
 
 		switch (actionCode) {
 			case TURN_LEFT:
@@ -144,34 +152,43 @@ public class GeneticController implements Controller {
 
 		//add the energy info to the array
 		inputCode.add(getEnergy(theAgent.getEnergy()), 2);
+		//System.out.print("E: " + getEnergy(theAgent.getEnergy()));
 
 		//add the direction the agent is facing to the array
 		inputCode.add(simulation.getTopology()
 				.getRotationBetween(Topology.NORTH, theAgent.getPosition().direction)
 				.ordinal(), 2);
 
+		//System.out.print(", D: " + simulation.getTopology().getRotationBetween(Topology.NORTH, theAgent.getPosition().direction).ordinal());
+
 		//add the viewing info to the array
 
 		SeeInfo get = theAgent.getState(VisionState.class).distanceLook();
 		inputCode.add(get.getType(), 2);
 		inputCode.add(get.getDist(), 2);
+		//System.out.print(", V: " + get.getType() + ", " + get.getDist());
 
 		//add the memory buffer to the array
 		inputCode.add(
 				quantize(theAgent.getMemoryBuffer(), params.memoryBits),
 				params.memoryBits);
+		//System.out.print(", M: " + quantize(theAgent.getMemoryBuffer(), params.memoryBits));
 
 		//add the communications to the array
 		inputCode.add(
 				quantize(theAgent.getCommInbox(), params.communicationBits),
 				params.communicationBits);
+		//System.out.print(", C: " + quantize(theAgent.getCommInbox(), params.communicationBits));
 
 		for (Entry<String, Integer> ss : params.stateSizes.entrySet()) {
 			StateParameter sp = simulation.getStateParameter(ss.getKey());
 			double value = sp.getValue(theAgent);
 			int size = ss.getValue();
 			inputCode.add(quantize(value, size), size);
+			//System.out.print(", S: " + quantize(value, size));
 		}
+
+		//System.out.println();
 
 		return inputCode;
 	}

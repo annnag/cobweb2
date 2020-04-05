@@ -1,7 +1,11 @@
 package org.cobweb.cobweb2.plugins.personalities;
 
 import org.cobweb.cobweb2.Simulation;
-import org.cobweb.cobweb2.core.*;
+import org.cobweb.cobweb2.core.Agent;
+import org.cobweb.cobweb2.core.Direction;
+import org.cobweb.cobweb2.core.LocationDirection;
+import org.cobweb.cobweb2.core.SimulationInternals;
+import org.cobweb.cobweb2.core.Topology;
 import org.cobweb.cobweb2.impl.ComplexAgent;
 import org.cobweb.cobweb2.plugins.ContactMutator;
 import org.cobweb.cobweb2.plugins.MoveMutator;
@@ -20,210 +24,218 @@ import org.cobweb.cobweb2.plugins.pd.PDMutator.PDTemptationCause;
  */
 public class PersonalityMutator extends StatefulSpawnMutatorBase<PersonalityState> implements ContactMutator, MoveMutator {
 
-    SimulationInternals sim;
-    PersonalityParams params;
+	SimulationInternals sim;
+	PersonalityParams params;
 
-    // Return whether something was actually overridden or not
-    @Override
-    public boolean overrideMove(Agent ag) {
+	// Return whether something was actually overridden or not
+	@Override
+	public boolean overrideMove(Agent ag) {
 
-        Simulation simulation = (Simulation) sim;
-        ComplexAgent agent = (ComplexAgent) ag;
+		//System.out.println("PersonalityMutator.overrideMove(Agent ag)");
 
-        PersonalityState state = agent.getState(PersonalityState.class);
-        if (state == null) {
-            return false;
-        }
-        // Shouldn't use this if the agents don't have personalities or their openness or neuroticism
-        // isn't high enough to warrant any special moves
+		Simulation simulation = (Simulation) sim;
+		ComplexAgent agent = (ComplexAgent) ag;
 
-        /*
+		PersonalityState state = agent.getState(PersonalityState.class);
+		if (state == null) {
+			//System.out.println("PersonalityMutator state == null");
+			return false;
+		}
+		// Shouldn't use this if the agents don't have personalities or their openness or neuroticism
+		// isn't high enough to warrant any special moves
+
+		/*
         if (!state.agentParams.personalitiesEnabled ||
                 (state.agentParams.openness < 0.25 && state.agentParams.neuroticism < 0.25)) {
             return false;
         }
-        */
+		 */
 
-        if (!state.agentParams.personalitiesEnabled ||
-                (simulation.getRandom().nextFloat() > state.agentParams.openness &&
-                        simulation.getRandom().nextFloat() > state.agentParams.neuroticism)) {
-            return false;
-        }
+		if (!state.agentParams.personalitiesEnabled ||
+				(simulation.getRandom().nextFloat() > state.agentParams.openness &&
+						simulation.getRandom().nextFloat() > state.agentParams.neuroticism)) {
+			//System.out.println("PersonalityMutator fail: " + state.agentParams.personalitiesEnabled);
+			return false;
+		}
 
-        // Now find the closest agent
-        Agent closest = simulation.theEnvironment.getClosestAgent(agent);
-        LocationDirection l2 = closest.getPosition();
-        LocationDirection l1 = agent.getPosition();
-        if (simulation.getTopology().getDistance(l1, l2) < 2) {
-            agent.step();
-        } else  {
-            // If the direction of the agent is not facing the closest agent, make it turn
-            Direction agentToClosest = simulation.getTopology().getDirectionBetween4way(l1, l2);
-            Direction agentDirection = l1.direction;
+		//System.out.println("PersonalityMutator find the closest agent");
 
-            // If the agent is already heading in the right direction, then keep on going
-            if (agentToClosest.equals(agent.getPosition().direction)) {
-                if (simulation.getRandom().nextFloat() < state.agentParams.extroversion * 1.25 ||
-                        simulation.getRandom().nextFloat() < state.agentParams.neuroticism * 1.25) {
-                    agent.step();
-                } else {
-                    return false;
-                }
-            }            // Otherwise turn the agent towards the direction to the other agent
-            else if ((agentToClosest.equals(Topology.NORTH) && agentDirection.equals(Topology.EAST)) ||
-                    (agentToClosest.equals(Topology.NORTH) && agentDirection.equals(Topology.SOUTH)) ||
-                    (agentToClosest.equals(Topology.EAST) && agentDirection.equals(Topology.SOUTH)) ||
-                    (agentToClosest.equals(Topology.SOUTH) && agentDirection.equals(Topology.WEST)) ||
-                    (agentToClosest.equals(Topology.SOUTH) && agentDirection.equals(Topology.NORTH)) ||
-                    (agentToClosest.equals(Topology.WEST) && agentDirection.equals(Topology.NORTH))) {
-                if (simulation.getRandom().nextFloat() < state.agentParams.extroversion * 1.25 ||
-                        simulation.getRandom().nextFloat() < state.agentParams.neuroticism * 1.25) {
-                    agent.turnLeft();
-                } else {
-//                    agent.turnRight();
-                    return false;
-                }
-            } else if ((agentToClosest.equals(Topology.NORTH) && agentToClosest.equals(Topology.WEST)) ||
-                    (agentToClosest.equals(Topology.EAST) && agentToClosest.equals(Topology.NORTH)) ||
-                    (agentToClosest.equals(Topology.EAST) && agentToClosest.equals(Topology.WEST)) ||
-                    (agentToClosest.equals(Topology.SOUTH) && agentToClosest.equals(Topology.EAST)) ||
-                    (agentToClosest.equals(Topology.WEST) && agentToClosest.equals(Topology.SOUTH)) ||
-                    (agentToClosest.equals(Topology.WEST) && agentToClosest.equals(Topology.EAST))) {
-                if (simulation.getRandom().nextFloat() < state.agentParams.extroversion * 1.25 ||
-                        simulation.getRandom().nextFloat() < state.agentParams.neuroticism * 1.25) {
-                    agent.turnRight();
-                } else {
-//                    agent.turnLeft();
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
+		// Now find the closest agent
+		Agent closest = simulation.theEnvironment.getClosestAgent(agent);
+		LocationDirection l2 = closest.getPosition();
+		LocationDirection l1 = agent.getPosition();
+		if (simulation.getTopology().getDistance(l1, l2) < 2) {
+			agent.step();
+		} else  {
+			// If the direction of the agent is not facing the closest agent, make it turn
+			Direction agentToClosest = simulation.getTopology().getDirectionBetween4way(l1, l2);
+			Direction agentDirection = l1.direction;
 
-    public PersonalityMutator(SimulationInternals sim) {
-        super(PersonalityState.class, sim);
-        this.sim = sim;
-    }
+			// If the agent is already heading in the right direction, then keep on going
+			if (agentToClosest.equals(agent.getPosition().direction)) {
+				if (simulation.getRandom().nextFloat() < state.agentParams.extroversion * 1.25 ||
+						simulation.getRandom().nextFloat() < state.agentParams.neuroticism * 1.25) {
+					agent.step();
+				} else {
+					return false;
+				}
+			}            // Otherwise turn the agent towards the direction to the other agent
+			else if ((agentToClosest.equals(Topology.NORTH) && agentDirection.equals(Topology.EAST)) ||
+					(agentToClosest.equals(Topology.NORTH) && agentDirection.equals(Topology.SOUTH)) ||
+					(agentToClosest.equals(Topology.EAST) && agentDirection.equals(Topology.SOUTH)) ||
+					(agentToClosest.equals(Topology.SOUTH) && agentDirection.equals(Topology.WEST)) ||
+					(agentToClosest.equals(Topology.SOUTH) && agentDirection.equals(Topology.NORTH)) ||
+					(agentToClosest.equals(Topology.WEST) && agentDirection.equals(Topology.NORTH))) {
+				if (simulation.getRandom().nextFloat() < state.agentParams.extroversion * 1.25 ||
+						simulation.getRandom().nextFloat() < state.agentParams.neuroticism * 1.25) {
+					agent.turnLeft();
+				} else {
+					//                    agent.turnRight();
+					return false;
+				}
+			} else if ((agentToClosest.equals(Topology.NORTH) && agentToClosest.equals(Topology.WEST)) ||
+					(agentToClosest.equals(Topology.EAST) && agentToClosest.equals(Topology.NORTH)) ||
+					(agentToClosest.equals(Topology.EAST) && agentToClosest.equals(Topology.WEST)) ||
+					(agentToClosest.equals(Topology.SOUTH) && agentToClosest.equals(Topology.EAST)) ||
+					(agentToClosest.equals(Topology.WEST) && agentToClosest.equals(Topology.SOUTH)) ||
+					(agentToClosest.equals(Topology.WEST) && agentToClosest.equals(Topology.EAST))) {
+				if (simulation.getRandom().nextFloat() < state.agentParams.extroversion * 1.25 ||
+						simulation.getRandom().nextFloat() < state.agentParams.neuroticism * 1.25) {
+					agent.turnRight();
+				} else {
+					//                    agent.turnLeft();
+					return false;
+				}
+			}
+			else
+				return false;
+		}
+		return true;
+	}
 
-    public void setParams(PersonalityParams params) {
-        this.params = params;
-    }
+	public PersonalityMutator(SimulationInternals sim) {
+		super(PersonalityState.class, sim);
+		this.sim = sim;
+	}
 
-    @Override
-    public PersonalityState stateForNewAgent(Agent agent) {
-        if (!params.personalitiesEnabled) {
-            return null;
-        }
-        return new PersonalityState(params.agentParams[agent.getType()].clone());
-    }
+	public void setParams(PersonalityParams params) {
+		this.params = params;
+	}
 
-    @Override
-    protected PersonalityState stateFromParent(Agent agent, PersonalityState parentState) {
-        if (!params.personalitiesEnabled) {
-            return null;
-        }
+	@Override
+	public PersonalityState stateForNewAgent(Agent agent) {
+		if (!params.personalitiesEnabled) {
+			return null;
+		}
+		return new PersonalityState(params.agentParams[agent.getType()].clone());
+	}
 
-        return new PersonalityState(parentState.agentParams.clone());
-    }
+	@Override
+	protected PersonalityState stateFromParent(Agent agent, PersonalityState parentState) {
+		if (!params.personalitiesEnabled) {
+			return null;
+		}
 
-    @Override
-    public void onContact(Agent bumper, Agent bumpee) {
-        ComplexAgent me = (ComplexAgent) bumper;
-        if (!hasAgentState(me))
-            return;
+		return new PersonalityState(parentState.agentParams.clone());
+	}
 
-        ComplexAgent other = (ComplexAgent) bumpee;
-        if (!hasAgentState(other))
-            return;
+	@Override
+	public void onContact(Agent bumper, Agent bumpee) {
+		ComplexAgent me = (ComplexAgent) bumper;
+		if (!hasAgentState(me))
+			return;
 
-        if (me.isAgentGood(other) && other.isAgentGood(me)) {
-            playPDonStep(me, other);
-        }
-    }
+		ComplexAgent other = (ComplexAgent) bumpee;
+		if (!hasAgentState(other))
+			return;
 
-    // Need to redefine PD in terms of the personality traits
-    // Use return value to determine whether the opposite PD needs to be played or not.
+		if (me.isAgentGood(other) && other.isAgentGood(me)) {
+			playPDonStep(me, other);
+		}
+	}
 
-    public boolean playPD(PersonalityState meState, PersonalityState otherState) {
+	// Need to redefine PD in terms of the personality traits
+	// Use return value to determine whether the opposite PD needs to be played or not.
 
-        if (sim.getRandom().nextFloat() < meState.agentParams.extroversion ||
-                sim.getRandom().nextFloat() < otherState.agentParams.extroversion) {
-            return false;
-        }
+	public boolean playPD(PersonalityState meState, PersonalityState otherState) {
 
-        // If this agent is agreeable and the other is conscientious, then <me> will lose and <other> will win
-        if (meState.agentParams.agreeableness + otherState.agentParams.consciousness > 1.5) {
-            meState.pdCheater = false;
-            otherState.pdCheater = true;
-            return false;
-        }
-        // If this agent is conscientious and the other is agreeable, then <me> will win and <other> will lose
-        if (meState.agentParams.consciousness + otherState.agentParams.agreeableness > 1.5) {
-            meState.pdCheater = true;
-            otherState.pdCheater = false;
-            return false;
-        }
+		if (sim.getRandom().nextFloat() < meState.agentParams.extroversion ||
+				sim.getRandom().nextFloat() < otherState.agentParams.extroversion) {
+			return false;
+		}
 
-        // Otherwise we are going to play normal PD
-        // Calculate cooperation probability based on how close they are to agreeable/conscientious
-        double coopProb = (meState.agentParams.agreeableness - meState.agentParams.consciousness + 0.75) / 1.5;
-        if (sim.getRandom().nextFloat() >  coopProb) {
-            meState.pdCheater = true;
-        } else {
-            meState.pdCheater = false;
-        }
-        return true; // Because other needs to play PD
-    }
+		// If this agent is agreeable and the other is conscientious, then <me> will lose and <other> will win
+		if (meState.agentParams.agreeableness + otherState.agentParams.consciousness > 1.5) {
+			meState.pdCheater = false;
+			otherState.pdCheater = true;
+			return false;
+		}
+		// If this agent is conscientious and the other is agreeable, then <me> will win and <other> will lose
+		if (meState.agentParams.consciousness + otherState.agentParams.agreeableness > 1.5) {
+			meState.pdCheater = true;
+			otherState.pdCheater = false;
+			return false;
+		}
 
-    public void playPDonStep(ComplexAgent me, Agent adjacentAgent) {
-        PersonalityState meState = getAgentState(me);
-        PersonalityState otherState = getAgentState(adjacentAgent);
+		// Otherwise we are going to play normal PD
+		// Calculate cooperation probability based on how close they are to agreeable/conscientious
+		double coopProb = (meState.agentParams.agreeableness - meState.agentParams.consciousness + 0.75) / 1.5;
+		if (sim.getRandom().nextFloat() >  coopProb) {
+			meState.pdCheater = true;
+		} else {
+			meState.pdCheater = false;
+		}
+		return true; // Because other needs to play PD
+	}
 
-        // Calculate the possibility that the two agents, given their personalities, are going to play
-        // prisoner's dilemma.
-        float probOfPlayingMe = (float) Math.sqrt(Math.max(meState.agentParams.agreeableness, meState.agentParams.consciousness) * (1 - meState.agentParams.openness));
-        float probOfPlayingOther = (float) Math.sqrt(Math.max(otherState.agentParams.agreeableness, otherState.agentParams.consciousness)* (1 - otherState.agentParams.openness));
-        if (sim.getRandom().nextFloat() > probOfPlayingMe || sim.getRandom().nextFloat() > probOfPlayingOther) {
-            return;
-        }
+	public void playPDonStep(ComplexAgent me, Agent adjacentAgent) {
+		PersonalityState meState = getAgentState(me);
+		PersonalityState otherState = getAgentState(adjacentAgent);
 
-        if (playPD(meState, otherState)) {
-            playPD(otherState, meState);
-        }
+		// Calculate the possibility that the two agents, given their personalities, are going to play
+		// prisoner's dilemma.
+		float probOfPlayingMe = (float) Math.sqrt(Math.max(meState.agentParams.agreeableness, meState.agentParams.consciousness) * (1 - meState.agentParams.openness));
+		float probOfPlayingOther = (float) Math.sqrt(Math.max(otherState.agentParams.agreeableness, otherState.agentParams.consciousness)* (1 - otherState.agentParams.openness));
+		if (sim.getRandom().nextFloat() > probOfPlayingMe || sim.getRandom().nextFloat() > probOfPlayingOther) {
+			return;
+		}
 
-        if (!meState.pdCheater && !otherState.pdCheater) {
-            /* Both cooperate */
-            me.changeEnergy(+params.reward, new PDRewardCause());
-            adjacentAgent.changeEnergy(+params.reward, new PDRewardCause());
+		if (playPD(meState, otherState)) {
+			playPD(otherState, meState);
+		}
 
-        } else if (!meState.pdCheater && otherState.pdCheater) {
-            /* Only other agent cheats */
-            me.changeEnergy(+params.sucker, new PDSuckerCause());
-            adjacentAgent.changeEnergy(+params.temptation, new PDTemptationCause());
+		if (!meState.pdCheater && !otherState.pdCheater) {
+			/* Both cooperate */
+			me.changeEnergy(+params.reward, new PDRewardCause());
+			adjacentAgent.changeEnergy(+params.reward, new PDRewardCause());
 
-        } else if (meState.pdCheater && !otherState.pdCheater) {
-            /* Only this agent cheats */
-            me.changeEnergy(+params.temptation, new PDTemptationCause());
-            adjacentAgent.changeEnergy(+params.sucker, new PDSuckerCause());
+		} else if (!meState.pdCheater && otherState.pdCheater) {
+			/* Only other agent cheats */
+			me.changeEnergy(+params.sucker, new PDSuckerCause());
+			adjacentAgent.changeEnergy(+params.temptation, new PDTemptationCause());
 
-        } else if (meState.pdCheater && otherState.pdCheater) {
-            /* Both cheat */
-            me.changeEnergy(+params.punishment, new PDPunishmentCause());
-            adjacentAgent.changeEnergy(+params.punishment, new PDPunishmentCause());
-        }
+		} else if (meState.pdCheater && !otherState.pdCheater) {
+			/* Only this agent cheats */
+			me.changeEnergy(+params.temptation, new PDTemptationCause());
+			adjacentAgent.changeEnergy(+params.sucker, new PDSuckerCause());
 
-        if (otherState.pdCheater)
-            iveBeenCheated(me, adjacentAgent);
-    }
+		} else if (meState.pdCheater && otherState.pdCheater) {
+			/* Both cheat */
+			me.changeEnergy(+params.punishment, new PDPunishmentCause());
+			adjacentAgent.changeEnergy(+params.punishment, new PDPunishmentCause());
+		}
 
-    private static void iveBeenCheated(ComplexAgent me, Agent cheater) {
-        me.rememberBadAgent(cheater);
-        me.broadcast(new CheaterBroadcast(cheater, me), new PDMutator.BroadcastCheaterCause());
-    }
+		if (otherState.pdCheater)
+			iveBeenCheated(me, adjacentAgent);
+	}
 
-    @Override
-    protected boolean validState(PersonalityState state) {
-        return state != null;
-    }
+	private static void iveBeenCheated(ComplexAgent me, Agent cheater) {
+		me.rememberBadAgent(cheater);
+		me.broadcast(new CheaterBroadcast(cheater, me), new PDMutator.BroadcastCheaterCause());
+	}
+
+	@Override
+	protected boolean validState(PersonalityState state) {
+		return state != null;
+	}
 }

@@ -1,6 +1,7 @@
 /**
- *
+ * @author David Fu
  */
+
 package org.cobweb.cobweb2.ui.swing.config;
 
 import java.awt.BorderLayout;
@@ -25,32 +26,32 @@ import javax.swing.table.TableColumnModel;
 
 import org.cobweb.cobweb2.SimulationConfig;
 import org.cobweb.cobweb2.impl.ai.BehaviorArray;
-import org.cobweb.cobweb2.impl.ai.GeneticController;
-import org.cobweb.cobweb2.impl.ai.GeneticControllerParams;
-import org.cobweb.cobweb2.impl.ai.GeneticStateAgentParams;
+import org.cobweb.cobweb2.impl.ai.SwarmController;
+import org.cobweb.cobweb2.impl.ai.SwarmControllerParams;
+import org.cobweb.cobweb2.impl.ai.SwarmStateAgentParams;
 import org.cobweb.swingutil.ColorLookup;
 
-final class GeneticAIPanel extends SettingsPanel {
+final class SwarmAIPanel extends SettingsPanel {
 
 	private static final long serialVersionUID = 1139521733160862828L;
-	private GeneticControllerParams params;
+	private SwarmControllerParams params;
 	private ColorLookup agentColors;
 	private Dialog parentWindow;
 
-	public GeneticAIPanel(ColorLookup agentColors, Dialog parentWindow) {
+	public SwarmAIPanel(ColorLookup agentColors, Dialog parentWindow) {
 		this.agentColors = agentColors;
 		this.parentWindow = parentWindow;
 	}
 
 	@Override
 	public void bindToParser(SimulationConfig p) {
-		if (!(p.controllerParams instanceof GeneticControllerParams)) {
-			p.setControllerName(GeneticController.class.getName());
+		if (!(p.controllerParams instanceof SwarmControllerParams)) {
+			p.setControllerName(SwarmController.class.getName());
 			// SimulationConfig sets a blank default, but if the page already has settings, use them
 			if (params != null)
 				p.controllerParams = params;
 		}
-		params = (GeneticControllerParams) p.controllerParams;
+		params = (SwarmControllerParams) p.controllerParams;
 
 		updateBoxes();
 	}
@@ -136,9 +137,10 @@ final class GeneticAIPanel extends SettingsPanel {
 				try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
 						new File(directory + file))))) {
 
-					GeneticStateAgentParams agentParams = params.agentParams[type];
+					SwarmStateAgentParams agentParams = params.agentParams[type];
+					//agentParams.stateSizes.keySet();
 
-					BehaviorArray array = new GeneticController(null, agentParams).ga;
+					BehaviorArray array = new SwarmController(null, agentParams, params.agentParams.length).ga;
 
 					// Header
 					// Input bits
@@ -156,7 +158,7 @@ final class GeneticAIPanel extends SettingsPanel {
 					for (int i = 0; i < agentParams.communicationBits; i++) {
 						out.print("Communication " + (i + 1)); out.print('\t');
 					}
-					for (Entry<String, Integer> state : agentParams.stateSizes.entrySet()) {
+					for (Entry<String, Float> state : agentParams.stateSizes.entrySet()) {
 						String name = state.getKey();
 						for (int i = 0; i < state.getValue(); i++) {
 							out.print(name + " " + (i + 1));  out.print('\t');

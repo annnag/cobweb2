@@ -6,6 +6,7 @@ import java.lang.reflect.Array;
 
 import javax.swing.JPanel;
 
+import org.cobweb.cobweb2.SimulationConfig;
 import org.cobweb.cobweb2.plugins.PerTypeParam;
 import org.cobweb.io.ChoiceCatalog;
 import org.cobweb.io.ParameterSerializable;
@@ -27,7 +28,7 @@ public class TwoTableConfigPage<Tmain extends PerTypeParam<TperType>, TperType e
 	}
 
 	public TwoTableConfigPage(Class<Tmain> paramClass, Tmain params, String mainName, ColorLookup colors, String mainColumn, ChoiceCatalog catalog) {
-		this( paramClass, params,  mainName,  colors,  mainColumn,  catalog, "Agent Preferences", "Agent");
+		this( paramClass, params,  mainName,  colors,  mainColumn,  catalog, SimulationConfig.agentLabel + " Preferences", SimulationConfig.agentLabel);
 	}
 
 	public TwoTableConfigPage(Class<Tmain> paramClass, Tmain params, String mainName, ColorLookup colors, String mainColumn, ChoiceCatalog catalog,

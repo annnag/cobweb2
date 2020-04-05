@@ -73,6 +73,16 @@ public class EnvironmentConfigPage implements ConfigPage {
 		fieldPane.add(new JLabel(wrap.getLabelText()));
 		fieldPane.add(wrap);
 
+		BoundCheckBox wrapX = new BoundCheckBox(params.envParams,
+				new FieldPropertyAccessor(ComplexEnvironmentParams.class.getField("wrapMapX")));
+		fieldPane.add(new JLabel(wrapX.getLabelText()));
+		fieldPane.add(wrapX);
+
+		BoundCheckBox wrapY = new BoundCheckBox(params.envParams,
+				new FieldPropertyAccessor(ComplexEnvironmentParams.class.getField("wrapMapY")));
+		fieldPane.add(new JLabel(wrapY.getLabelText()));
+		fieldPane.add(wrapY);
+
 
 		BoundJFormattedTextField AgentNum = new BoundJFormattedTextField(params,
 				new SetterPropertyAccessor(SimulationConfig.class.getMethod("setAgentTypes", int.class)),
@@ -87,10 +97,25 @@ public class EnvironmentConfigPage implements ConfigPage {
 
 		fieldPane.add(new JLabel(AgentNum.getLabelText()));
 		fieldPane.add(AgentNum);
+		//---------------------------------------------------------------------------------------------------
+		BoundJFormattedTextField AgentLabel = new BoundJFormattedTextField(params,
+				new SetterPropertyAccessor(SimulationConfig.class.getMethod("setAgentLabel", String.class)));
+		AgentLabel.addPropertyChangeListener("value", new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				refresher.refreshConfig();
+			}
+		});
+
+		//AgentLabel.setS
+
+		fieldPane.add(new JLabel(AgentLabel.getLabelText()));
+		fieldPane.add(AgentLabel);
 
 		panel11.add(fieldPane, BorderLayout.CENTER);
 
-		makeOptionsTable(fieldPane, 4);
+		makeOptionsTable(fieldPane, 7);
 		return panel11;
 	}
 

@@ -1,8 +1,8 @@
 package org.cobweb.cobweb2.core;
 
-import junit.framework.TestCase;
-
 import org.cobweb.util.RandomNoGenerator;
+
+import junit.framework.TestCase;
 
 
 public class TopologyTest extends TestCase {
@@ -45,7 +45,7 @@ public class TopologyTest extends TestCase {
 	private RandomSource randomSource = new TestRandomSource();
 
 	public void testDistanceSimple() {
-		Topology t = new Topology(randomSource, 10, 10, false);
+		Topology t = new Topology(randomSource, 10, 10, false, false, false);
 
 		assertEquals(0.0, t.getDistance(l00, l00));
 		assertEquals(1.0, t.getDistance(l00, l01));
@@ -58,7 +58,7 @@ public class TopologyTest extends TestCase {
 	}
 
 	public void testDistanceWrap() {
-		Topology t = new Topology(randomSource, 10, 10, true);
+		Topology t = new Topology(randomSource, 10, 10, true, false, false);
 
 		assertEquals(0.0, t.getDistance(l00, l00));
 		assertEquals(1.0, t.getDistance(l00, l01));

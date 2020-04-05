@@ -211,10 +211,12 @@ public class LinearAIPanel extends SettingsPanel {
 
 			prettyTable(matrix, scrollpane);
 
-			matrixTabPane.addTab("Agent " + (i + 1), weightsPanel);
+			//matrixTabPane.addTab("Agent " + (i + 1), weightsPanel);
+			matrixTabPane.addTab(SimulationConfig.agentLabel + " " + (i + 1), weightsPanel);
 		}
 
-		JTable paramTable = new MixedValueJTable(new ConfigTableModel(params.agentParams, "Agent "));
+		//JTable paramTable = new MixedValueJTable(new ConfigTableModel(params.agentParams, "Agent "));
+		JTable paramTable = new MixedValueJTable(new ConfigTableModel(params.agentParams, SimulationConfig.agentLabel + " "));
 		JScrollPane paramScroll = new JScrollPane(paramTable);
 		paramScroll.setPreferredSize(new Dimension(0, 80));
 		Util.colorHeaders(paramTable, true, agentColors);

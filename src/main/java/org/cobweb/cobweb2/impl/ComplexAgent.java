@@ -72,6 +72,8 @@ public class ComplexAgent extends Agent {
 
 	protected float currentActionPoints = 0f;
 
+	public int stop_count = 0;
+
 	public ComplexAgent(SimulationInternals sim, int type) {
 		super(type);
 		this.simulation = sim;
@@ -487,6 +489,7 @@ public class ComplexAgent extends Agent {
 	 * <p> Energy penalties are deducted from the agent.
 	 */
 	public void step() {
+		stop_count = 0;
 		Agent adjAgent;
 		LocationDirection destPos = environment.topology.getAdjacent(getPosition());
 
@@ -534,6 +537,7 @@ public class ComplexAgent extends Agent {
 		if (pregnant) {
 			pregPeriod--;
 		}
+
 	}
 
 	protected void onstepFreeTile(LocationDirection destPos) {
@@ -662,7 +666,7 @@ public class ComplexAgent extends Agent {
 		}
 	}
 
-    /**
+	/**
 	 * Controls what happens to the agent on this tick.  If the
 	 * agent is still alive, what happens to the agent is determined
 	 * by the controller.
@@ -704,8 +708,11 @@ public class ComplexAgent extends Agent {
 	protected void makeAMove()
 	{
 		if (!getAgentListener().onNextMove(this)) {
+			//System.out.println("controller.controlAgent");
 			controller.controlAgent(this, getAgentListener());
 		}
+		//else
+		//System.out.println("move overriden...");
 	}
 
 	/**
@@ -727,6 +734,7 @@ public class ComplexAgent extends Agent {
 	 * energy it took to turn.
 	 */
 	public void turnLeft() {
+		stop_count++;
 		position = environment.topology.getTurnLeftPosition(position);
 		changeEnergy(-params.turnLeftEnergy.getValue(), new TurnLeftCause());
 		afterTurnAction();
@@ -738,6 +746,7 @@ public class ComplexAgent extends Agent {
 	 * to turn.
 	 */
 	public void turnRight() {
+		stop_count++;
 		position = environment.topology.getTurnRightPosition(position);
 		changeEnergy(-params.turnRightEnergy.getValue(), new TurnRightCause());
 		afterTurnAction();

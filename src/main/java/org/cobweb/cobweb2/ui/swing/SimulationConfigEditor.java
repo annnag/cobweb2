@@ -26,7 +26,27 @@ import org.cobweb.cobweb2.SimulationConfig;
 import org.cobweb.cobweb2.impl.FoodwebParams;
 import org.cobweb.cobweb2.io.Cobweb2Serializer;
 import org.cobweb.cobweb2.ui.UserInputException;
-import org.cobweb.cobweb2.ui.swing.config.*;
+import org.cobweb.cobweb2.ui.swing.config.AIPanel;
+import org.cobweb.cobweb2.ui.swing.config.AbioticAgentConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.AbioticFactorConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.AgentConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.ConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.DiseaseConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.DisplaySettings;
+import org.cobweb.cobweb2.ui.swing.config.EnvironmentConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.FoodwebConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.FusionConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.GeneticConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.GravityConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.LearningConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.PDConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.PersonalityConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.ProductionConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.ResourceConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.SettingsPanel;
+import org.cobweb.cobweb2.ui.swing.config.SwarmConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.ToxinConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.WasteConfigPage;
 
 /**
  * Simulation configuration dialog
@@ -364,7 +384,7 @@ public class SimulationConfigEditor implements ConfigRefresher {
 
 		removeOldPage(abioticPage);
 		abioticPage = new AbioticAgentConfigPage(p.abioticParams.agentParams, serializer.choiceCatalog, displaySettings.agentColor);
-		tabbedPane.addTab("Agent Abiotic", abioticPage.getPanel());
+		tabbedPane.addTab(SimulationConfig.agentLabel + " Abiotic", abioticPage.getPanel());
 
 		removeOldPage(personalityPage);
 		personalityPage = new PersonalityConfigPage(p.personalityParams, displaySettings.agentColor);

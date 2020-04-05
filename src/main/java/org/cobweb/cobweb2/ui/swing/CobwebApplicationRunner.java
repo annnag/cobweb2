@@ -176,7 +176,7 @@ public class CobwebApplicationRunner {
 
 		}
 
-		//System.err.println("inputFileName: " + inputFileName + ", java.io.tmpdir: " + System.getProperty("java.io.tmpdir") + ", file.separator: " + System.getProperty("file.separator"));
+		//System.out.println("inputFileName: " + inputFileName + ", java.io.tmpdir: " + System.getProperty("java.io.tmpdir") + ", file.separator: " + System.getProperty("file.separator"));
 
 		Cobweb2Serializer serializer = new Cobweb2Serializer();
 		SimulationConfig defaultconf = null;

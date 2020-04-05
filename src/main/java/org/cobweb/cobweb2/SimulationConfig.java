@@ -63,6 +63,24 @@ public class SimulationConfig implements SimulationParams, ParameterSerializable
 	private int agentTypeCount = 4;
 
 	/**
+	 * Agent Label.
+	 */
+	@ConfDisplayName("Agent Label")
+	@ConfXMLTag("AgentLabel")
+	public void setAgentLabel(String agentLabel) {
+		this.agentLabel = agentLabel;
+		agentCountChanged();
+	}
+
+	//Override
+	public String getAgentLabel() {
+		return agentLabel;
+	}
+
+	public static String agentLabel = "Agent";
+
+
+	/**
 	 * Class name of the controller object.
 	 */
 	@ConfDisplayName("Controller type")

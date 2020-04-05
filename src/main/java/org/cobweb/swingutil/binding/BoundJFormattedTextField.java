@@ -21,11 +21,21 @@ public class BoundJFormattedTextField extends JFormattedTextField implements Fie
 	private final Object obj;
 	private final PropertyAccessor field;
 
+	public BoundJFormattedTextField(Object obj, PropertyAccessor accessor) {
+		this.obj = obj;
+		this.field = accessor;
+		init(obj, accessor);
+	}
+
 	public BoundJFormattedTextField(Object obj, PropertyAccessor accessor, Format format) {
 		super(format);
 		this.obj = obj;
 		this.field = accessor;
+		init(obj, accessor);
+	}
 
+	public void init(Object obj, PropertyAccessor accessor)
+	{
 		// Set current value
 		this.setValue(field.get(this.obj));
 		this.addPropertyChangeListener("value", this);

@@ -21,6 +21,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import org.cobweb.cobweb2.SimulationConfig;
 import org.cobweb.cobweb2.core.Phenotype;
 import org.cobweb.cobweb2.plugins.genetics.GeneticParams;
 import org.cobweb.cobweb2.plugins.genetics.MeiosisMode;
@@ -88,7 +89,8 @@ public class GeneticConfigPage implements ConfigPage {
 		public String getColumnName(int column) {
 			if (column == 0)
 				return "Phenotype";
-			return "Agent " + column;
+			//return "Agent " + column;
+			return SimulationConfig.agentLabel + " " + column;
 		}
 	}
 
@@ -238,7 +240,7 @@ public class GeneticConfigPage implements ConfigPage {
 		JScrollPane phenotypeScroller = new JScrollPane(listAvailable);
 		phenotypeScroller.setPreferredSize(new Dimension(240, 500));
 
-		Util.makeGroupPanel(phenotypeScroller, "Agent Parameter Selection");
+		Util.makeGroupPanel(phenotypeScroller, SimulationConfig.agentLabel + " Parameter Selection");
 		return phenotypeScroller;
 	}
 

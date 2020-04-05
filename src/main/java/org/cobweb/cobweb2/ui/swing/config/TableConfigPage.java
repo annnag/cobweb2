@@ -7,6 +7,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumnModel;
 
+import org.cobweb.cobweb2.SimulationConfig;
 import org.cobweb.io.ChoiceCatalog;
 import org.cobweb.io.ParameterSerializable;
 import org.cobweb.swingutil.ColorLookup;
@@ -36,8 +37,11 @@ public class TableConfigPage<T extends ParameterSerializable> implements ConfigP
 	public TableConfigPage(T[] params, String name, String colPrefix, ColorLookup agentColors, ChoiceCatalog catalog) {
 		panel = new JPanel(new BorderLayout());
 
+		//if (colPrefix == null)
+		//colPrefix = "Agenter";
+
 		if (colPrefix == null)
-			colPrefix = "Agent";
+			colPrefix = SimulationConfig.agentLabel;
 
 		ConfigTableModel model = new ConfigTableModel(params, colPrefix);
 		model.choiceCatalog = catalog;

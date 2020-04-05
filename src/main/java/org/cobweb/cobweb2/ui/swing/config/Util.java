@@ -32,6 +32,9 @@ public class Util {
 	public	static void updateTable(JTable table) {
 		int row = table.getEditingRow();
 		int col = table.getEditingColumn();
+
+		//System.out.println("updateTable is editing: " + table.isEditing());
+
 		if (table.isEditing()) {
 			table.getCellEditor(row, col).stopCellEditing();
 		}

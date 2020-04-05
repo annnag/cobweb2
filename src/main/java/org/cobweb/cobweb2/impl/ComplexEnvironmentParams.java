@@ -27,11 +27,25 @@ public class ComplexEnvironmentParams implements ParameterSerializable {
 	public int height = 80;
 
 	/**
-	 * Enables the grid to wrap around at the edges.
+	 * Enables the grid to wrap around globe style.
 	 */
-	@ConfDisplayName("Wrap edges")
+	@ConfDisplayName("Wrap(Globe-style)")
 	@ConfXMLTag("wrap")
 	public boolean wrapMap = true;
+
+	/**
+	 * Enables the grid to wrap around at the horizontal edges.
+	 */
+	@ConfDisplayName("Wrap horizontal")
+	@ConfXMLTag("wrapX")
+	public boolean wrapMapX = false;
+
+	/**
+	 * Enables the grid to wrap around at the vertical edges.
+	 */
+	@ConfDisplayName("Wrap vertical")
+	@ConfXMLTag("wrapY")
+	public boolean wrapMapY = false;
 
 	/**
 	 * Number of stones to randomly place

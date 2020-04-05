@@ -4,10 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.cobweb.cobweb2.Simulation;
-import org.cobweb.cobweb2.core.*;
-import org.cobweb.cobweb2.impl.ComplexAgent;
+import org.cobweb.cobweb2.core.Agent;
+import org.cobweb.cobweb2.core.Cause;
+import org.cobweb.cobweb2.core.Location;
+import org.cobweb.cobweb2.core.LocationDirection;
+import org.cobweb.cobweb2.core.SimulationTimeSpace;
+import org.cobweb.cobweb2.core.StateParameter;
+import org.cobweb.cobweb2.core.StatePlugin;
 import org.cobweb.cobweb2.impl.ComplexEnvironment;
-import org.cobweb.cobweb2.plugins.*;
+import org.cobweb.cobweb2.plugins.EnvironmentMutator;
+import org.cobweb.cobweb2.plugins.LocationMutator;
+import org.cobweb.cobweb2.plugins.SpawnMutator;
+import org.cobweb.cobweb2.plugins.StatefulMutatorBase;
+import org.cobweb.cobweb2.plugins.StepMutator;
 
 /**
  * AbioticMutator is an instance of Step and Spawn Mutator
@@ -15,7 +24,7 @@ import org.cobweb.cobweb2.plugins.*;
  * @author ???
  */
 public class AbioticMutator extends StatefulMutatorBase<AbioticState> implements StepMutator, StatePlugin,
-		EnvironmentMutator, SpawnMutator, LocationMutator {
+EnvironmentMutator, SpawnMutator, LocationMutator {
 
 	public AbioticMutator() {
 		super(AbioticState.class);
@@ -51,35 +60,35 @@ public class AbioticMutator extends StatefulMutatorBase<AbioticState> implements
 	}
 
 	private LocationDirection handleBarrierFactor(int factor, LocationDirection from, LocationDirection to, Agent agent) {
-	    if (from == null || to == null) return to;
+		if (from == null || to == null) return to;
 
-        ComplexEnvironment env = ((Simulation) sim).theEnvironment;
+		ComplexEnvironment env = ((Simulation) sim).theEnvironment;
 
-        float toValue = getValue(factor, to);
-        float fromValue = getValue(factor, from);
-        if (toValue > agent.getEnergy() && fromValue < agent.getEnergy()) {
-            // Case where the agent just stepped into an area of too high energy
-            LocationDirection newLoc = new LocationDirection(from, sim.getTopology().getRandomDirection());
-            env.setAgent(to, null);
-            env.setAgent(newLoc, agent);
-            return newLoc;
-        } else if (toValue > agent.getEnergy() && fromValue > agent.getEnergy()) {
-            // Case where agent in both locations are too high energy
-            if (params.factors.get(factor).getMin() > agent.getEnergy()) {
-                agent.changeEnergy(-agent.getEnergy() - 1, new BarrierCause()); // If there is no place that can support an agent of such energy
-            } else {
-                for (int k = 0; k < Math.max(sim.getTopology().width, sim.getTopology().height); k++) {
-                    LocationDirection newLoc = new LocationDirection(sim.getTopology().getRandomLocation(), sim.getTopology().getRandomDirection());
-                    if (getValue(factor, newLoc) < agent.getEnergy() && !env.hasAgent(newLoc)) {
-                        env.setAgent(to, null);
-                        env.setAgent(newLoc, agent);
-                        return newLoc;
-                    }
-                }
-            }
-        }
-        return to;
-    }
+		float toValue = getValue(factor, to);
+		float fromValue = getValue(factor, from);
+		if (toValue > agent.getEnergy() && fromValue < agent.getEnergy()) {
+			// Case where the agent just stepped into an area of too high energy
+			LocationDirection newLoc = new LocationDirection(from, sim.getTopology().getRandomDirection());
+			env.setAgent(to, null);
+			env.setAgent(newLoc, agent);
+			return newLoc;
+		} else if (toValue > agent.getEnergy() && fromValue > agent.getEnergy()) {
+			// Case where agent in both locations are too high energy
+			if (params.factors.get(factor).getMin() > agent.getEnergy()) {
+				agent.changeEnergy(-agent.getEnergy() - 1, new BarrierCause()); // If there is no place that can support an agent of such energy
+			} else {
+				for (int k = 0; k < Math.max(sim.getTopology().width, sim.getTopology().height); k++) {
+					LocationDirection newLoc = new LocationDirection(sim.getTopology().getRandomLocation(), sim.getTopology().getRandomDirection());
+					if (getValue(factor, newLoc) < agent.getEnergy() && !env.hasAgent(newLoc)) {
+						env.setAgent(to, null);
+						env.setAgent(newLoc, agent);
+						return newLoc;
+					}
+				}
+			}
+		}
+		return to;
+	}
 
 
 	/**
@@ -87,15 +96,15 @@ public class AbioticMutator extends StatefulMutatorBase<AbioticState> implements
 	 */
 	@Override
 	public LocationDirection getNewLocation(Agent agent, LocationDirection from, LocationDirection originalTo) {
-        for (int i = 0; i < params.factors.size(); i++) {
-            if (!params.factors.get(i).punishment) {
-                LocationDirection newLoc = handleBarrierFactor(i, from, originalTo, agent);
-                if (!newLoc.equals(from)) {
-                    return newLoc;
-                }
-            }
-        }
-        return originalTo;
+		for (int i = 0; i < params.factors.size(); i++) {
+			if (!params.factors.get(i).punishment) {
+				LocationDirection newLoc = handleBarrierFactor(i, from, originalTo, agent);
+				if (!newLoc.equals(from)) {
+					return newLoc;
+				}
+			}
+		}
+		return originalTo;
 	}
 
 	/**
@@ -113,13 +122,13 @@ public class AbioticMutator extends StatefulMutatorBase<AbioticState> implements
 
 		AbioticState state = getAgentState(agent);
 		for (int i = 0; i < params.factors.size(); i++) {
-		    if (params.factors.get(i).punishment) {
-                AbioticFactorState factorState = state.factorStates[i];
-                float effect = effectAtLocation(i, to, state);
-                float multiplier = 1 + effect;
+			if (params.factors.get(i).punishment) {
+				AbioticFactorState factorState = state.factorStates[i];
+				float effect = effectAtLocation(i, to, state);
+				float multiplier = 1 + effect;
 
-                factorState.agentParams.parameter.modifyValue(causeKeys[i], agent, multiplier);
-            }
+				factorState.agentParams.parameter.modifyValue(causeKeys[i], agent, multiplier);
+			}
 		}
 	}
 
@@ -226,10 +235,10 @@ public class AbioticMutator extends StatefulMutatorBase<AbioticState> implements
 	}
 
 	public static class BarrierCause implements Cause {
-	    @Override
-        public String getName() {
-	        return "No compatible region";
-        }
-    }
+		@Override
+		public String getName() {
+			return "No compatible region";
+		}
+	}
 
 }

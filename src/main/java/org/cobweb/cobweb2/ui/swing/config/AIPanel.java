@@ -15,13 +15,14 @@ import javax.swing.JPanel;
 import org.cobweb.cobweb2.SimulationConfig;
 import org.cobweb.cobweb2.impl.ai.GeneticController;
 import org.cobweb.cobweb2.impl.ai.LinearWeightsController;
+import org.cobweb.cobweb2.impl.ai.SwarmController;
 import org.cobweb.swingutil.ColorLookup;
 
 public class AIPanel extends SettingsPanel {
 
 	private static final long serialVersionUID = 6045306756522429063L;
 
-	private static final String[] AI_LIST = { GeneticController.class.getSimpleName(), LinearWeightsController.class.getSimpleName() };
+	private static final String[] AI_LIST = { GeneticController.class.getSimpleName(), LinearWeightsController.class.getSimpleName(), SwarmController.class.getSimpleName() };
 
 	private CardLayout cardSwitch = new CardLayout();
 	private JPanel inner = new JPanel();
@@ -55,6 +56,10 @@ public class AIPanel extends SettingsPanel {
 		SettingsPanel lWpanel = new LinearAIPanel(agentColors);
 		inner.add(lWpanel, AI_LIST[1]);
 		tabs[1] = lWpanel;
+
+		SettingsPanel swarmPanel = new SwarmAIPanel(agentColors, parentWindow);
+		inner.add(swarmPanel, AI_LIST[2]);
+		tabs[2] = swarmPanel;
 
 		final JComboBox<String> aiSwitch = new JComboBox<String>(AI_LIST);
 		aiSwitch.setEditable(false);
