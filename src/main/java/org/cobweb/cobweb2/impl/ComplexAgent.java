@@ -708,16 +708,8 @@ public class ComplexAgent extends Agent {
 	protected void makeAMove()
 	{
 		if (!getAgentListener().onNextMove(this)) {
-<<<<<<< HEAD
-			//System.out.println("controller.controlAgent");
 			controller.controlAgent(this, getAgentListener());
 		}
-		//else
-		//System.out.println("move overriden...");
-=======
-			controller.controlAgent(this, getAgentListener());
-		}
->>>>>>> ffe69c2aaaf3bb9231f015e4563224af93dc06d2
 	}
 
 	/**
