@@ -14,6 +14,7 @@ import org.cobweb.cobweb2.impl.ai.GeneticController;
 import org.cobweb.cobweb2.impl.ai.GeneticControllerParams;
 import org.cobweb.cobweb2.plugins.ResizableParam;
 import org.cobweb.cobweb2.plugins.abiotic.AbioticParams;
+import org.cobweb.cobweb2.plugins.circle.CircleParams;
 import org.cobweb.cobweb2.plugins.disease.DiseaseParams;
 import org.cobweb.cobweb2.plugins.food.FoodGrowthParams;
 import org.cobweb.cobweb2.plugins.fusion.FusionParams;
@@ -194,6 +195,9 @@ public class SimulationConfig implements SimulationParams, ParameterSerializable
 
 	@ConfXMLTag("Gravity")
 	public GravityParams gravityParams = new GravityParams(this);
+
+	@ConfXMLTag("Gravity")
+	public CircleParams circleParams = new CircleParams(this);
 
 	/**
 	 * Creates the default Cobweb simulation parameters.

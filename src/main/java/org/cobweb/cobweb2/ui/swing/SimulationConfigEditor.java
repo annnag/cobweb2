@@ -47,6 +47,7 @@ import org.cobweb.cobweb2.ui.swing.config.SettingsPanel;
 import org.cobweb.cobweb2.ui.swing.config.SwarmConfigPage;
 import org.cobweb.cobweb2.ui.swing.config.ToxinConfigPage;
 import org.cobweb.cobweb2.ui.swing.config.WasteConfigPage;
+import org.cobweb.cobweb2.ui.swing.config.CircleConfigPage;
 
 /**
  * Simulation configuration dialog
@@ -142,6 +143,8 @@ public class SimulationConfigEditor implements ConfigRefresher {
 	private PersonalityConfigPage personalityPage;
 
 	private GravityConfigPage gravityConfigPage;
+
+	private CircleConfigPage circleConfigPage;
 
 	private final JTabbedPane tabbedPane;
 
@@ -393,6 +396,10 @@ public class SimulationConfigEditor implements ConfigRefresher {
 		removeOldPage(gravityConfigPage);
 		gravityConfigPage = new GravityConfigPage(p.gravityParams, displaySettings.agentColor);
 		tabbedPane.addTab("Gravity", gravityConfigPage.getPanel());
+
+		removeOldPage(circleConfigPage);
+		circleConfigPage = new CircleConfigPage(p.circleParams, displaySettings.agentColor);
+		tabbedPane.addTab("Circular Motion", circleConfigPage.getPanel());
 	}
 
 	private void removeOldPage(ConfigPage r) {
